@@ -1,90 +1,55 @@
-package Formularios;
+package Clases;
 
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.List;
 
 public class Presupuesto {
-    public Presupuesto(){
-        nuevoClienteButton.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NewClientDialog nc = new NewClientDialog();
-                nc.setModal(true);
-                nc.pack();
-                nc.setVisible(true);
-                String docid = nc.getDNI().getText();
-            }
-        });
+    private int id;
+    private String fecha;
+    private int cantidad;
+    private Cliente cliente;
+    private Trabajador trabajador;
+    private Empresa empresa;
+    private List<Producto> producto;
 
-        nuevaEmpresaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NewEmpresaDialog ne = new NewEmpresaDialog();
-                ne.setModal(true);
-                ne.pack();
-                ne.setVisible(true);
-                String cif = ne.getCIF().getText();
-                String nombre = ne.getNombre().getText();
-                String dir = ne.getDireccion().getText();
-            }
-        });
+    public Presupuesto() {}
 
-        buscarCliente.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    public int getId() {return id;}
 
-            }
-        });
+    public void setId(int id) {this.id = id;}
 
-        buscarEmpresa.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    public String getFecha() {return fecha;}
 
-            }
-        });
+    public void setFecha(String fecha) {this.fecha = fecha;}
 
-        nuevaLineaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    public int getCantidad() {return cantidad;}
 
-            }
-        });
+    public void setCantidad(int cantidad) {this.cantidad = cantidad;}
 
-        eliminarLineaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    public Cliente getCliente() {return cliente;}
 
-            }
-        });
+    public void setCliente(Cliente cliente) {this.cliente = cliente;}
+
+    public Trabajador getTrabajador() {return trabajador;}
+
+    public void setTrabajador(Trabajador trabajador) {this.trabajador = trabajador;}
+
+    public Empresa getEmpresa() {return empresa;}
+
+    public void setEmpresa(Empresa empresa) {this.empresa = empresa;}
+
+    public List<Producto> getProducto() {return producto;}
+
+    public void setProducto(List<Producto> producto) {this.producto = producto;}
+
+    @Override
+    public String toString() {
+        return "PresupuestoForm{" +
+                "id=" + id +
+                ", fecha='" + fecha + '\'' +
+                ", cliente=" + cliente +
+                ", trabajador=" + trabajador +
+                ", empresa=" + empresa +
+                ", producto=" + producto +
+                '}';
     }
-
-
-    private TableModel tableModel;
-//    private List<ArrayList>;
-
-
-    static class LineaPresupuesto{
-        int cantidad;
-        String concepto;
-        double precio;
-        int total;
-    }
-
-    public JPanel getMainPanel() {
-        return MainPanel;
-    }
-
-    private JPanel MainPanel;
-    private JButton nuevoClienteButton;
-    private JButton buscarCliente;
-    private JTextField Cliente;
-    private JButton buscarEmpresa;
-    private JButton nuevaEmpresaButton;
-    private JTextField Empresa;
-    private JTable Productos;
-    private JButton nuevaLineaButton;
-    private JTextArea Observaciones;
-    private JButton eliminarLineaButton;
 }

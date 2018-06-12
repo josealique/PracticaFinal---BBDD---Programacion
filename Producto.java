@@ -1,64 +1,53 @@
-package Formularios;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+package Clases;
 
 public class Producto {
-    private JLabel Header;
-    private JButton Aceptar;
-    private JButton cancelarButton;
-    private JTable table1;
-    private JPanel MainPanel;
+    private int Id;
+    private String Nombre;
+    private int Stock;
+    private double Precio;
+    private int Cantidad;
+    private Empresa empresa;
 
-    public JPanel getMainPanel() {
-        return MainPanel;
+    public Producto(){}
+
+    public Producto(String Nombre, int Stock, double Precio){
+        this.Nombre = Nombre;
+        this.Stock = Stock;
+        this.Precio = Precio;
     }
 
-    public JButton getAceptar() {
-        return Aceptar;
+    public int getId() {return Id;}
+
+    public void setId(int id) {Id = id;}
+
+    public String getNombre() {return Nombre;}
+
+    public void setNombre(String Nombre) {this.Nombre = Nombre;}
+
+    public int getStock() {return Stock;}
+
+    public void setStock(int Stock){this.Stock = Stock;}
+
+    public double getPrecio() {return Precio;}
+
+    public void setPrecio(double precio) {Precio = precio;}
+
+    public int getCantidad() {return Cantidad;}
+
+    public void setCantidad(int cantidad) {this.Cantidad = cantidad;}
+
+    public Empresa getEmpresa() {return empresa;}
+
+    public void setEmpresa(Empresa empresa) {this.empresa = empresa;}
+
+    @Override
+    public String toString() {
+        return "Producto{" +
+                "Id=" + Id +
+                ", Nombre='" + Nombre + '\'' +
+                ", Stock=" + Stock + '\'' +
+                ", Precio=" + Precio + '\'' +
+                ", Empresa=" + this.empresa + '\'' +
+                '}';
     }
-
-    public Producto(){
-        Aceptar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                JOptionPane.showMessageDialog(null,"Los campos no pueden estar vacios","Error",JOptionPane.ERROR_MESSAGE);
-            }
-        });
-    }
-
-    // Tabla
-//    List<Producte> list = new ArrayList<>();
-//    TableModel tableModel = new AbstractTableModel() {
-//        @Override
-//        public int getRowCount() {
-//            return list.size();
-//        }
-//
-//        @Override
-//        public int getColumnCount() {
-//            return 4;
-//        }
-//
-//        @Override
-//        public Object getValueAt(int rowIndex, int columnIndex) {
-//            return null;
-//        }
-//
-//        @Override
-//        public String getColumnName(int column) {
-//            switch (column){
-//                case 0:
-//                    return "Id Producto";
-//                case 1:
-//                    return "Nombre";
-//                case 2:
-//                    return "Precio_Base";
-//                case 3:
-//                    return "Stock";
-//            }
-//        }
-//    }
 }

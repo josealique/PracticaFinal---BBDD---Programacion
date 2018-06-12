@@ -1,98 +1,117 @@
 package DAO;
+
 import Clases.Conexion;
-import Clases.Producte;
+import Clases.Empresa;
+import Clases.Producto;
 import Interfaces.DAOProducte;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DAOProducteImpl implements DAOProducte {
 
     private Conexion conexion = new Conexion();
     private Connection getCon = conexion.getConexion();
 
-    public DAOProducteImpl() throws SQLException {
-    }
+    public DAOProducteImpl() throws SQLException {}
 
     @Override
-    public void insertar(Producte prod) throws Exception {
+    public void insertar(Producto prod) throws Exception {
         try {
-            PreparedStatement ps = getCon.prepareStatement("INSERT INTO Producto(Nombre,Precio_Base,Stock) VALUES(?,?,?)");
-            ps.setString(1,prod.getNombre());
-            ps.setInt(2,prod.getPrecio_Base());
-            ps.setInt(3,prod.getStock());
+            // Preparamos las querys
+            PreparedStatement ps = getCon.prepareStatement("INSERT INTO Producto(Nombre,Stock) VALUES(?,?)");
+            // Cogemos los valores correspondientes de la tabla
+            ps.setString(1, prod.getNombre());
+            ps.setInt(2, prod.getStock());
             ps.execute();
-
+            // Cogeremos la ultima ID insertada en la base de datos
             PreparedStatement getID = getCon.prepareStatement("SELECT LAST_INSERT_ID()");
+            // Ejecutamos un ResultSet para poder recorrer el PreparedStatement y coger cada valor
             ResultSet rs = getID.executeQuery();
             // Cogemos la siguiente ID
             rs.next();
-            PreparedStatement ps1 = getCon.prepareStatement("INSERT INTO Pro_Empresa(Id_Empresa,Id_Producto,Precio) VALUES(18783,?,?)");
-            ps1.setInt(1,rs.getInt(1));
-            ps1.setInt(2,rs.getInt(1));
-        } catch (Exception e){
-            throw e;
+            // Insertamos en la tabla Pro_Empresa sus valores correspondientes, ya que esta tabla es la que contiene el precio del producto
+            // según la empresa
+            PreparedStatement ps1 = getCon.prepareStatement("INSERT INTO Pro_Empresa(CIF_Empresa,Id_Producto,Precio) VALUES(?,?,?)");
+            ps1.setInt(1,prod.getEmpresa().getCIF());
+            ps1.setInt(2, rs.getInt(1));
+            ps1.setDouble(3, prod.getPrecio());
+            ps1.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void eliminar(Producte prod) throws Exception {
+    public void eliminar(Producto prod) throws Exception {
         try {
             // Preparamos las Querys
-            PreparedStatement ps1 = getCon.prepareStatement("DELETE FROM Producto_Presup WHERE Id_Producto = ?");
+            PreparedStatement ps1 = getCon.prepareStatement("DELETE FROM Pro_Empresa WHERE Id_Producto = ?");
             PreparedStatement ps = getCon.prepareStatement("DELETE FROM Producto WHERE Id = ?");
             // Escogemos los campos de la BBDD
-            ps1.setInt(1,1);
-            ps.setInt(1,prod.getId());
+            ps1.setInt(1, 1);
+            ps.setInt(1, prod.getId());
             // Ejecutamos las Querys
             ps1.execute();
             ps.execute();
-        } catch (Exception e){
-            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void actualizar(Producte prod) throws Exception {
+    public void actualizar(Producto producto) throws Exception {
         try {
-            PreparedStatement ps = getCon.prepareStatement("UPDATE Producto SET Id = '"+prod.getId()+"', " +
-                    " Nombre = '"+prod.getNombre()+"', " +
-                    " Precio_Base = '"+prod.getPrecio_Base()+"', Stock = '"+prod.getStock()+"' WHERE Id = ?");
-            ps.setInt(1,prod.getId());
-            ps.setString(1,prod.getNombre());
-            ps.setInt(1,prod.getPrecio_Base());
-            ps.setInt(1,prod.getStock());
+            // Preparamos la query que actualizará el producto
+            PreparedStatement ps = getCon.prepareStatement("UPDATE Producto SET Nombre = ?," +
+                    " Stock = ?" + " WHERE Id = ? ");
+            ps.setString(1,producto.getNombre());
+            ps.setInt(2,producto.getStock());
+            ps.setInt(3,producto.getId());
             ps.execute();
 
-            PreparedStatement getID = getCon.prepareStatement("SELECT LAST_INSERT_ID()");
-            ResultSet rs = getID.executeQuery();
-            // Cogemos la siguiente ID
-            rs.next();
-
-            PreparedStatement ps1 = getCon.prepareStatement("UPDATE Producto_Presup SET Id_Producto = '"+rs.getInt(1)+"'");
+            PreparedStatement ps1 = getCon.prepareStatement("UPDATE Pro_Empresa SET CIF_Empresa = ?," +
+                    "Precio = ? WHERE Id_Producto = ?");
+            ps1.setInt(1,producto.getEmpresa().getCIF());
+            ps1.setDouble(2,producto.getPrecio());
+            ps1.setInt(3,producto.getId());
             ps1.execute();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public List<Producte> listarProductos() throws Exception {
-        List<Producte> list = new ArrayList<>();
-        try {
-            PreparedStatement ps = getCon.prepareStatement("SELECT prod.Id, prod.Nombre, prod.Precio_Base, prod.Stock FROM " +
-                    "Producto prod INNER JOIN Empresa emp ON emp.Id = prod.Id");
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                Producte prod = new Producte();
-                resultSet.getInt(1);
-                resultSet.getString(1);
-                resultSet.getInt(1);
-                resultSet.getInt(1);
-                list.add(prod);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
+    public List<Producto> listarProductos() throws Exception {
+        // Creamos una lista de Objetos de tipo Empresa
+        List<Producto> list = new ArrayList<>();
+        // Hacemos un INNER JOIN entre Producto, Empresa y entre el Producto_Empresa
+        PreparedStatement ps = getCon.prepareStatement("SELECT emp.*, prod.Id, prod.Nombre, prod.Stock, prodEmp.Precio FROM Producto AS prod" +
+                " INNER JOIN Pro_Empresa prodEmp ON prodEmp.Id_Producto = prod.Id" +
+                " INNER JOIN Empresa emp on emp.CIF = prodEmp.CIF_Empresa");
+        ResultSet resultSet = ps.executeQuery();
+        // Recorremos la query para poder coger cada valor
+        while (resultSet.next()) {
+            // Creamos un objeto de tipo Empresa
+            Empresa empresa = new Empresa();
+            // Cogemos los valores correspondientes de cada fila de la tabla Empresa
+            empresa.setCIF(resultSet.getInt(1));
+            empresa.setTelefono(resultSet.getInt(2));
+            empresa.setNombre(resultSet.getString(3));
+            empresa.setDireccion(resultSet.getString(4));
+            empresa.setEstado(resultSet.getString(5));
+            empresa.setCampoObservaciones(resultSet.getString(6));
+            // Creamos un objeto de tipo Producto
+            Producto prod = new Producto();
+            // Cogemos los valores correspondientes de cada fila de la tabla Producto
+            prod.setId(resultSet.getInt(7));
+            prod.setNombre(resultSet.getString(8));
+            prod.setStock(resultSet.getInt(9));
+            prod.setPrecio(resultSet.getDouble(10));
+            // Por ultimo le añadimos la empresa correspondiente a ese producto
+            prod.setEmpresa(empresa);
+            // Añadimos a la lista el producto creado anteriormente
+            list.add(prod);
         }
+        return list;
     }
 }

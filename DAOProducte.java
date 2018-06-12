@@ -1,12 +1,12 @@
 package Interfaces;
 
-import Clases.Producte;
+import Clases.Producto;
 
 import java.util.List;
 
 public interface DAOProducte {
-    public void insertar (Producte prod) throws Exception;
-    public void eliminar (Producte prod) throws Exception;
-    public void actualizar (Producte prod) throws Exception;
-    public List<Producte> listarProductos () throws Exception;
+    void insertar(Producto prod) throws Exception;
+    void eliminar(Producto prod) throws Exception;
+    void actualizar(Producto prod) throws Exception;
+    List<Producto> listarProductos() throws Exception;
 }
